@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能体互动系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 添加字体图标库 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="bi bi-link-45deg"></i> 智能体互动系统</h1>
+            <p>生成身份，连接智能体，开始对话</p>
+        </header>
+
+        <!-- 控制面板 - DID 生成 -->
+        <section class="control-panel">
+            <div class="generate-did-section">
+                <h3><i class="bi bi-fingerprint"></i> 生成身份（DID）</h3>
+                <div class="input-group">
+                    <input type="text" id="did-name" placeholder="输入名称（可选）">
+                    <button id="generate-did-btn"><i class="bi bi-key"></i> 生成DID</button>
+                </div>
+                <div class="did-display" id="did-display" style="display: none;">
+                    <h4>您的身份已生成</h4>
+                    <div class="did-content">
+                        <textarea id="generated-did" readonly></textarea>
+                        <button id="copy-did-btn" title="复制到剪贴板"><i class="bi bi-clipboard"></i> 复制</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 双窗口聊天界面 -->
+        <div class="dual-chat-container">
+            <!-- 英语学习助手窗口 -->
+            <div class="chat-window">
+                <div class="chat-header">
+                    <i class="bi bi-mortarboard-fill"></i>
+                    <h2>英语学习助手</h2>
+                </div>
+                <div class="chat-messages" id="english-chat-messages">
+                    <!-- 英语学习助手聊天消息 -->
+                    <div class="message message-system">
+                        <div class="message-content">
+                            您好！我是您的英语学习助手。请输入您想学习的内容或问题。
+                        </div>
+                    </div>
+                </div>
+                <div class="in-chat-loading" id="english-loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>正在思考回答...</p>
+                </div>
+                <div class="message-input">
+                    <textarea id="english-message-input" placeholder="输入您的英语学习问题..."></textarea>
+                    <button id="english-send-btn" title="发送消息">
+                        <i class="bi bi-send"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 智能体间对话窗口 -->
+            <div class="chat-window">
+                <div class="chat-header">
+                    <i class="bi bi-robot"></i>
+                    <h2>智能体连接</h2>
+                    <div class="did-input-container">
+                        <input type="text" id="connect-did-input" placeholder="粘贴智能体DID">
+                        <button id="connect-agent-btn" title="连接智能体"><i class="bi bi-link"></i> 连接</button>
+                    </div>
+                </div>
+                <div class="chat-messages" id="agent-chat-messages">
+                    <!-- 智能体间对话消息 -->
+                    <div class="message message-system">
+                        <div class="message-content">
+                            请先生成您的身份（DID），然后连接其他智能体开始对话。
+                        </div>
+                    </div>
+                </div>
+                <div class="in-chat-loading" id="agent-loading" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>等待智能体响应...</p>
+                </div>
+                <div class="connection-status" id="connection-status">未连接</div>
+                <div class="message-input">
+                    <textarea id="agent-message-input" placeholder="输入消息..." disabled></textarea>
+                    <button id="agent-send-btn" title="发送消息" disabled>
+                        <i class="bi bi-send"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>基于自压缩DID技术 | 使用SiliconFlow API</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

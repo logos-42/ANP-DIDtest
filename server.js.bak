@@ -1,0 +1,98 @@
+ // DID连接前端应用服务器
+import express from 'express';
+import cors from 'cors';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { connectToAgent, getAgentInfo } from './lib/agent.js';
+import { parseDID, isValidDID } from './lib/did.js';
+
+// 获取当前文件的目录
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// 初始化Express应用
+const app = express();
+const port = process.env.PORT || 3000;
+
+// 中间件
+app.use(cors());
+app.use(express.json());
+app.use(express.static(join(__dirname, 'public')));
+
+// API路由 - 解析DID
+app.post('/api/parse-did', (req, res) => {
+  try {
+    const { did } = req.body;
+    
+    if (!did) {
+      return res.status(400).json({ error: '缺少DID参数' });
+    }
+    
+    // 解析DID
+    const parsedDID = parseDID(did);
+    
+    if (!parsedDID) {
+      return res.status(400).json({ error: '无效的DID格式' });
+    }
+    
+    // 返回智能体信息
+    const agentInfo = getAgentInfo(did);
+    return res.json({ 
+      success: true, 
+      agent: agentInfo 
+    });
+    
+  } catch (error) {
+    console.error('解析DID错误:', error);
+    return res.status(500).json({ error: '处理DID时出错: ' + error.message });
+  }
+});
+
+// API路由 - 发送消息
+app.post('/api/send-message', async (req, res) => {
+  try {
+    const { did, message, senderDID, chatHistory } = req.body;
+    
+    if (!did || !message) {
+      return res.status(400).json({ error: '缺少必要参数' });
+    }
+    
+    // 发送消息
+    const response = await connectToAgent(did, message, senderDID || '', chatHistory || []);
+    
+    return res.json({
+      success: true,
+      response
+    });
+    
+  } catch (error) {
+    console.error('发送消息错误:', error);
+    return res.status(500).json({ 
+      error: '发送消息时出错: ' + error.message,
+      details: error.response ? error.response.data : null
+    });
+  }
+});
+
+// 验证DID
+app.post('/api/validate-did', (req, res) => {
+  try {
+    const { did } = req.body;
+    
+    if (!did) {
+      return res.status(400).json({ error: '缺少DID参数' });
+    }
+    
+    const valid = isValidDID(did);
+    return res.json({ valid });
+    
+  } catch (error) {
+    console.error('验证DID错误:', error);
+    return res.status(500).json({ error: '验证DID时出错: ' + error.message });
+  }
+});
+
+// 启动服务器
+app.listen(port, () => {
+  console.log(`DID连接前端应用运行在 http://localhost:${port}`);
+});
